@@ -7,7 +7,7 @@ namespace HuggingFace.API
     public class TextToAudioTask : TaskBase<string, byte[]>
     {
         public override string taskName => "TextToAudio";
-        public override string defaultEndpoint => "https://api-inference.huggingface.co/models/facebook/musicgen-small";
+        public override string defaultEndpoint => "https://api-inference.huggingface.co/models/facebook/mms-tts-eng";
 
         protected override IPayload GetPayload(string input, object context)
         {
