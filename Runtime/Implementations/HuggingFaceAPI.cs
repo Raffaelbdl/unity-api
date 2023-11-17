@@ -4,14 +4,20 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace HuggingFace.API {
-    public static class HuggingFaceAPI {
+namespace HuggingFace.API
+{
+    public static class HuggingFaceAPI
+    {
         private static IAPIConfig _config;
-        private static IAPIConfig config {
-            get {
-                if (_config == null) {
+        private static IAPIConfig config
+        {
+            get
+            {
+                if (_config == null)
+                {
                     _config = Resources.Load<APIConfig>("HuggingFaceAPIConfig");
-                    if (_config == null) {
+                    if (_config == null)
+                    {
                         Debug.LogError("HuggingFaceAPIConfig asset not found.");
                     }
                 }
@@ -20,9 +26,12 @@ namespace HuggingFace.API {
         }
 
         private static IAPIClient _apiClient;
-        private static IAPIClient apiClient {
-            get {
-                if (_apiClient == null) {
+        private static IAPIClient apiClient
+        {
+            get
+            {
+                if (_apiClient == null)
+                {
                     _apiClient = new APIClient();
                 }
                 return _apiClient;
@@ -31,17 +40,20 @@ namespace HuggingFace.API {
 
         private static Dictionary<string, ITask> tasks;
 
-        static HuggingFaceAPI() {
+        static HuggingFaceAPI()
+        {
             LoadTasks();
         }
 
-        private static void LoadTasks() {
+        private static void LoadTasks()
+        {
             tasks = new Dictionary<string, ITask>();
 
             var taskTypes = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(t => t.GetInterfaces().Contains(typeof(ITask)) && !t.IsInterface && !t.IsAbstract);
 
-            foreach (var taskType in taskTypes) {
+            foreach (var taskType in taskTypes)
+            {
                 var task = (ITask)Activator.CreateInstance(taskType);
                 tasks.Add(task.taskName, task);
             }
@@ -55,10 +67,14 @@ namespace HuggingFace.API {
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
         /// <param name="context"></param>
-        public static void Query(string taskName, object input, Action<object> onSuccess, Action<string> onError, object context = null) {
-            if (tasks.TryGetValue(taskName, out var task)) {
+        public static void Query(string taskName, object input, Action<object> onSuccess, Action<string> onError, object context = null)
+        {
+            if (tasks.TryGetValue(taskName, out var task))
+            {
                 task.Query(input, apiClient, config, onSuccess, onError, context);
-            } else {
+            }
+            else
+            {
                 onError($"Task {taskName} not found.");
             }
         }
@@ -71,7 +87,8 @@ namespace HuggingFace.API {
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
         /// <param name="context"></param>
-        public static void Conversation(string input, Action<string> onSuccess, Action<string> onError, Conversation context = null) {
+        public static void Conversation(string input, Action<string> onSuccess, Action<string> onError, Conversation context = null)
+        {
             Query<string, string, Conversation>("Conversation", input, onSuccess, onError, context);
         }
 
@@ -81,7 +98,8 @@ namespace HuggingFace.API {
         /// <param name="input"></param>
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
-        public static void TextToImage(string input, Action<Texture2D> onSuccess, Action<string> onError) {
+        public static void TextToImage(string input, Action<Texture2D> onSuccess, Action<string> onError)
+        {
             Query<string, Texture2D>("TextToImage", input, onSuccess, onError);
         }
 
@@ -91,7 +109,8 @@ namespace HuggingFace.API {
         /// <param name="input"></param>
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
-        public static void TextClassification(string input, Action<TextClassificationResponse> onSuccess, Action<string> onError) {
+        public static void TextClassification(string input, Action<TextClassificationResponse> onSuccess, Action<string> onError)
+        {
             Query<string, TextClassificationResponse>("TextClassification", input, onSuccess, onError);
         }
 
@@ -102,7 +121,8 @@ namespace HuggingFace.API {
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
         /// <param name="context"></param>
-        public static void QuestionAnswering(string input, Action<QuestionAnsweringResponse> onSuccess, Action<string> onError, string context) {
+        public static void QuestionAnswering(string input, Action<QuestionAnsweringResponse> onSuccess, Action<string> onError, string context)
+        {
             Query<string, QuestionAnsweringResponse, string>("QuestionAnswering", input, onSuccess, onError, context);
         }
 
@@ -113,7 +133,8 @@ namespace HuggingFace.API {
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
         /// <param name="context"></param>
-        public static void SentenceSimilarity(string input, Action<float[]> onSuccess, Action<string> onError, string[] context) {
+        public static void SentenceSimilarity(string input, Action<float[]> onSuccess, Action<string> onError, string[] context)
+        {
             Query<string, float[], string[]>("SentenceSimilarity", input, onSuccess, onError, context);
         }
 
@@ -123,7 +144,8 @@ namespace HuggingFace.API {
         /// <param name="input"></param>
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
-        public static void Translation(string input, Action<string> onSuccess, Action<string> onError) {
+        public static void Translation(string input, Action<string> onSuccess, Action<string> onError)
+        {
             Query<string, string>("Translation", input, onSuccess, onError);
         }
 
@@ -133,7 +155,8 @@ namespace HuggingFace.API {
         /// <param name="input"></param>
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
-        public static void Summarization(string input, Action<string> onSuccess, Action<string> onError) {
+        public static void Summarization(string input, Action<string> onSuccess, Action<string> onError)
+        {
             Query<string, string>("Summarization", input, onSuccess, onError);
         }
 
@@ -143,7 +166,8 @@ namespace HuggingFace.API {
         /// <param name="input"></param>
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
-        public static void TextGeneration(string input, Action<string> onSuccess, Action<string> onError) {
+        public static void TextGeneration(string input, Action<string> onSuccess, Action<string> onError)
+        {
             Query<string, string>("TextGeneration", input, onSuccess, onError);
         }
 
@@ -153,8 +177,14 @@ namespace HuggingFace.API {
         /// <param name="input"></param>
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
-        public static void AutomaticSpeechRecognition(byte[] input, Action<string> onSuccess, Action<string> onError) {
+        public static void AutomaticSpeechRecognition(byte[] input, Action<string> onSuccess, Action<string> onError)
+        {
             Query<byte[], string>("AutomaticSpeechRecognition", input, onSuccess, onError);
+        }
+
+        public static void TextToAudio(string input, Action<byte[]> onSuccess, Action<string> onError)
+        {
+            Query<string, byte[]>("TextToAudio", input, onSuccess, onError);
         }
 
         /// <summary>
@@ -163,17 +193,22 @@ namespace HuggingFace.API {
         /// <param name="apiKey"></param>
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
-        public static void TestAPIKey(string apiKey, Action<string> onSuccess, Action<string> onError) {
+        public static void TestAPIKey(string apiKey, Action<string> onSuccess, Action<string> onError)
+        {
             apiClient.TestAPIKey(apiKey, onSuccess, onError).RunCoroutine();
         }
 
-        private static void Query<TInput, TResponse>(string taskName, TInput input, Action<TResponse> onSuccess, Action<string> onError) {
-            if (!(input is TInput)) {
+        private static void Query<TInput, TResponse>(string taskName, TInput input, Action<TResponse> onSuccess, Action<string> onError)
+        {
+            if (!(input is TInput))
+            {
                 onError?.Invoke($"Input is not of type {typeof(TInput)}");
                 return;
             }
-            Query(taskName, input, (response) => {
-                if (!(response is TResponse)) {
+            Query(taskName, input, (response) =>
+            {
+                if (!(response is TResponse))
+                {
                     onError?.Invoke($"Response is not of type {typeof(TResponse)}");
                     return;
                 }
@@ -181,17 +216,22 @@ namespace HuggingFace.API {
             }, onError);
         }
 
-        private static void Query<TInput, TResponse, TContext>(string taskName, TInput input, Action<TResponse> onSuccess, Action<string> onError, TContext context = default(TContext)) {
-            if (!(input is TInput)) {
+        private static void Query<TInput, TResponse, TContext>(string taskName, TInput input, Action<TResponse> onSuccess, Action<string> onError, TContext context = default(TContext))
+        {
+            if (!(input is TInput))
+            {
                 onError?.Invoke($"Input is not of type {typeof(TInput)}");
                 return;
             }
-            if (!(context == null || context is TContext)) {
+            if (!(context == null || context is TContext))
+            {
                 onError?.Invoke($"Context is not of type {typeof(TContext)}");
                 return;
             }
-            Query(taskName, input, (response) => {
-                if (!(response is TResponse)) {
+            Query(taskName, input, (response) =>
+            {
+                if (!(response is TResponse))
+                {
                     onError?.Invoke($"Response is not of type {typeof(TResponse)}");
                     return;
                 }
